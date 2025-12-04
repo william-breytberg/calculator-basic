@@ -5,57 +5,58 @@
   p{
     text-align:right;
     font-family: monospace;
-    font-size: 150%;
-    padding: 2%;
-    margin: 5%;
+    font-size: 600%;
+    padding: 0.5%;
+    margin: 0.5%;
     border: 2px solid black;
   }
   button{
     font-family: monospace;
-    font-size: 150%;
-    margin: 2%;
-    width: 20%;
-    height: 20%;
+    font-size: 600%;
+    font-weight: bolder;
+    margin: 0.5%;
+    width: 18%;
+    padding: 2% 0%;
+    float: right;
   }
 </style>
 </head>
 <body>
 
 <p id="result">0</p>
-  <button type="button" onclick="numberAppend('1')">1</button>
-  <button type="button" onclick="numberAppend('2')">2</button>
+  <button type="button" onclick="numberAppend('5')">5</button>
+  <button type="button" onclick="numberAppend('4')">4</button>
   <button type="button" onclick="numberAppend('3')">3</button>
+  <button type="button" onclick="numberAppend('2')">2</button>
+  <button type="button" onclick="numberAppend('1')">1</button>
+<br>
+  <button type="button" onclick="numberAppend('0')">0</button>
+  <button type="button" onclick="numberAppend('9')">9</button>
+  <button type="button" onclick="numberAppend('8')">8</button>
+  <button type="button" onclick="numberAppend('7')">7</button>
+  <button type="button" onclick="numberAppend('6')">6</button>
+<br>
+  <button type="button" onclick="performOperation('%')">%</button>
+  <button type="button" onclick="performOperation('d')">÷</button>
+  <button type="button" onclick="performOperation('*')">×</button>
+  <button type="button" onclick="performOperation('-')">-</button>
   <button type="button" onclick="performOperation('+')">+</button>
 <br>
-  <button type="button" onclick="numberAppend('4')">4</button>
-  <button type="button" onclick="numberAppend('5')">5</button>
-  <button type="button" onclick="numberAppend('6')">6</button>
-  <button type="button" onclick="performOperation('*')">×</button>
-<br>
-  <button type="button" onclick="numberAppend('7')">7</button>
-  <button type="button" onclick="numberAppend('8')">8</button>
-  <button type="button" onclick="numberAppend('9')">9</button>
-  <button type="button" onclick="performOperation('d')">÷</button>
-<br>
-  <button type="button" onclick="decimalAppend()">.</button>
-  <button type="button" onclick="numberAppend('0')">0</button>
-  <button type="button" onclick="turnNegative()">-</button>
-  <button type="button" onclick="performOperation('%')">%</button>
-<br>
-  <button type="button" onclick="numberReset()">CLEAR</button>
-  <button type="button" onclick="numberDelete()">UNDO</button>
   <button type="button" onclick="completeOperation()">=</button>
+  <button type="button" onclick="turnNegative()">±</button>
+  <button type="button" onclick="decimalAppend()">.</button>
+  <button type="button" onclick="numberDelete()">UNDO</button>
+  <button type="button" onclick="numberReset()">CLEAR</button>
 
 
 <script>
-const resultEl = document.getElementById("result");
+const result = document.getElementById("result");
 
 // holdNum is null when there's no pending left-hand operand
 let holdNum = null;
 let operation = '';
 
 function formatResult(n){
-  if (!isFinite(n)) return 'Error';
   // limit to 12 significant digits to avoid long float strings
   const rounded = Number(n).toPrecision(12);
   // strip unnecessary trailing zeros/decimal
@@ -63,85 +64,78 @@ function formatResult(n){
 }
 
 function numberAppend(num){
-  if(resultEl.innerText === '0' || resultEl.innerText === 'Error'){
-    resultEl.innerText = num;
+  if(result.innerText === '0'){
+    result.innerText = num;
   } else {
-    resultEl.innerText += num;
+    result.innerText += num;
   }
 }
 
 function turnNegative(){
-  if(resultEl.innerText === 'Error') return;
-  if(resultEl.innerText.indexOf("-") === 0){
-    resultEl.innerText = resultEl.innerText.slice(1);
+  if(result.innerText.indexOf("-") === 0){
+    result.innerText = result.innerText.slice(1);
   } else {
-    resultEl.innerText = "-" + resultEl.innerText;
+    result.innerText = "-" + result.innerText;
   }
 }
 
 function decimalAppend(){
-  if(resultEl.innerText === 'Error') return;
-  if(resultEl.innerText.indexOf(".") < 0){
-    resultEl.innerText += ".";
+  if(result.innerText.indexOf(".") < 0){
+    result.innerText += ".";
   }
 }
 
 function numberReset(){
-  resultEl.innerText = '0';
+  result.innerText = '0';
   holdNum = null;
   operation = '';
 }
 
 function numberDelete(){
-  if(resultEl.innerText === 'Error'){
-    resultEl.innerText = '0';
-    return;
-  }
-  if(resultEl.innerText.length > 1){
-    resultEl.innerText = resultEl.innerText.slice(0,-1);
+  if(result.innerText.length > 1){
+    result.innerText = result.innerText.slice(0,-1);
     // if result becomes "-" alone, keep it as "0"
-    if(resultEl.innerText === "-" || resultEl.innerText === "-0"){
-      resultEl.innerText = '0';
+    if(result.innerText === "-" || result.innerText === "-0"){
+      result.innerText = '0';
     }
   } else {
-    resultEl.innerText = '0'
+    result.innerText = '0'
   }
 }
 
 function performOperation(newOper){
-  if(resultEl.innerText === 'Error') return;
-
   // If there's already a pending operation and a held number, compute it first (chaining)
   if(operation && holdNum !== null){
     const computeSuccess = compute();
     if(!computeSuccess) return; // e.g. division by zero -> stop
   }
-
   // store the current displayed number as the left-hand operand
-  holdNum = parseFloat(resultEl.innerText);
+  holdNum = parseFloat(result.innerText);
   operation = newOper;
   // prepare display for the next number
-  resultEl.innerText = '0';
+  result.innerText = '0';
 }
 
 function compute(){
   if(operation === '' || holdNum === null) return false;
 
-  const current = parseFloat(resultEl.innerText);
+  const current = parseFloat(result.innerText);
 
   let res;
   switch(operation){
     case '+':
       res = holdNum + current;
       break;
+    case '-':
+      res = holdNum - current;
+      break;
     case '*':
       res = holdNum * current;
       break;
     case 'd':
       if (current === 0){
-        resultEl.innerText = 'Error';
-        holdNum = null;
-        operation = '';
+        alert("division by 0")
+        numberReset()
         return false;
       }
       res = holdNum / current;
@@ -155,7 +149,7 @@ function compute(){
   }
 
   // format result to avoid long floating point artifacts
-  resultEl.innerText = formatResult(res);
+  result.innerText = formatResult(res);
   // after computing, clear the pending operation
   holdNum = null;
   operation = '';
@@ -163,7 +157,6 @@ function compute(){
 }
 
 function completeOperation(){
-  if(resultEl.innerText === 'Error') return;
   if(operation === '' || holdNum === null) {
     // nothing to do
     return;
